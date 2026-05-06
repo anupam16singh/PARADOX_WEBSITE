@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ParadoxAI Lab | Explained</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050505;
+      --surface: #0a0a0a;
+      --surface-2: #141414;
+      --text: #ffffff;
+      --muted: #a0a0a0;
+      --faint: #555555;
+      --line: rgba(255, 255, 255, 0.15);
+      --line-strong: rgba(255, 255, 255, 0.3);
+      --accent: #4ade80; /* Tactical green */
+      --sans: 'Inter', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; background: var(--bg); }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* TOP NAVIGATION */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 64px;
+      background: rgba(5, 5, 5, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+    }
+    .brand {
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    .brand span.sub {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    /* EXPLAINED LAYOUT */
+    .layout {
+      display: flex;
+      margin-top: 64px; /* offset for nav */
+      min-height: calc(100vh - 64px);
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 320px;
+      position: fixed;
+      top: 64px;
+      bottom: 0;
+      left: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+      padding: 40px 0;
+      overflow-y: auto;
+    }
+    .sidebar-title {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0 40px;
+      margin-bottom: 32px;
+    }
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+    }
+    .toc-item a {
+      display: block;
+      padding: 12px 40px;
+      font-size: 14px;
+      color: var(--muted);
+      border-left: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .toc-item a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .toc-item.active a {
+      color: var(--text);
+      border-left-color: var(--accent);
+      background: rgba(255, 255, 255, 0.03);
+      font-weight: 500;
+    }
+
+    /* MAIN CONTENT */
+    .main-content {
+      margin-left: 320px;
+      padding: 80px 100px 160px;
+      max-width: 1100px;
+    }
+    
+    .article-header {
+      margin-bottom: 80px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--line);
+    }
+    .article-header h1 {
+      font-size: clamp(48px, 6vw, 72px);
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+    .article-header p.lead {
+      font-size: 24px;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 800px;
+    }
+
+    /* SECTIONS */
+    .section-block {
+      margin-bottom: 100px;
+    }
+    .section-block h2 {
+      font-size: 32px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+    .section-block h3 {
+      font-size: 20px;
+      font-weight: 500;
+      margin: 40px 0 16px;
+      color: var(--text);
+    }
+    .section-block p {
+      font-size: 18px;
+      color: #cccccc;
+      margin-bottom: 24px;
+      max-width: 800px;
+    }
+    .section-block ul {
+      margin-left: 24px;
+      margin-bottom: 24px;
+      color: #cccccc;
+      font-size: 18px;
+      max-width: 800px;
+    }
+    .section-block li {
+      margin-bottom: 12px;
+    }
+    .section-block strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* MEDIA PLACEHOLDERS */
+    .media-wrapper {
+      margin: 48px 0;
+      border: 1px solid var(--line-strong);
+      background: var(--surface-2);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .media-wrapper video, .media-wrapper img {
+      width: 100%;
+      display: block;
+    }
+    .media-caption {
+      padding: 16px 24px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    /* HIGHLIGHT BOX */
+    .callout {
+      padding: 32px;
+      background: rgba(74, 222, 128, 0.05);
+      border-left: 4px solid var(--accent);
+      margin: 40px 0;
+      max-width: 800px;
+    }
+    .callout p {
+      margin: 0;
+      font-size: 20px;
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar {
+        display: none; /* Hide sidebar on mobile for simplicity, or make it a top dropdown */
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 40px 24px 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav class="nav">
+    <div class="brand">
+      <a href="index.html">ParadoxAI Lab</a>
+      <span class="sub">|</span>
+      <span class="sub">Explained</span>
+    </div>
+  </nav>
+
+  <div class="layout">
+    <!-- LEFT SIDEBAR (TABLE OF CONTENTS) -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Contents</div>
+      <ul class="toc-list" id="toc">
+        <li class="toc-item active"><a href="#intro">01. Introduction</a></li>
+        <li class="toc-item"><a href="#problem">02. The Problem</a></li>
+        <li class="toc-item"><a href="#solution">03. The Solution & Secret</a></li>
+        <li class="toc-item"><a href="#how-it-works">04. How It Works</a></li>
+        <li class="toc-item"><a href="#scenario">05. Example Scenario</a></li>
+        <li class="toc-item"><a href="#tech">06. Technology Stack</a></li>
+        <li class="toc-item"><a href="#proof">07. Validation & Proof</a></li>
+      </ul>
+    </aside>
+
+    <!-- RIGHT MAIN CONTENT -->
+    <main class="main-content">
+      
+      <header class="article-header" id="intro">
+        <h1>ParadoxAIS Explained</h1>
+        <p class="lead">A deep dive into the Geopolitical Decision Engine. Discover how moving from data aggregation to causal simulation eliminates defensive bias in high-stakes environments.</p>
+      </header>
+
+      <!-- 02. The Problem -->
+      <section class="section-block" id="problem">
+        <h2>The Problem: Defensive Bias</h2>
+        <p>Current geopolitical risk assessment is strictly reactive. Decision-makers in defense and global finance rely on static reports or data-heavy dashboards that tell them <em>what is happening</em>, but fail to project <em>what will happen next</em> or <em>how to respond</em>.</p>
+        <p>This abundance of data without causal context leads to <strong>"defensive bias"</strong>—over-reacting to threats or missing subtle de-escalation opportunities simply because the human cost of being wrong is too high.</p>
+        
+        <div class="media-wrapper">
+          <!-- High-Tech Image Placeholder -->
+          <img src="how_it_works.png" alt="Tactical Geopolitical Map">
+          <div class="media-caption">Figure 1.0 — Traditional systems mapping nodes without causal simulation. (Replace this img with Demo Video later)</div>
+        </div>
+      </section>
+
+      <!-- 03. The Solution -->
+      <section class="section-block" id="solution">
+        <h2>The Solution & The Secret</h2>
+        <p>ParadoxAIS is a <strong>"simulation-first" intelligence platform</strong>. It does not just aggregate data; it builds a living model of the world to test "What If" scenarios in a mathematically safe environment. It identifies the causal links between events (e.g., how a regional trade disruption impacts global energy prices) and recommends specific, risk-adjusted actions.</p>
+        
+        <div class="callout">
+          <p>The secret is that <strong>causal simulation, not data aggregation, is the only way to de-bias human decision-making.</strong> By modeling the underlying mechanics of a crisis rather than just its symptoms, ParadoxAIS allows users to find the non-obvious de-escalation pathways that big-data dashboards miss.</p>
+        </div>
+      </section>
+
+      <!-- 04. How It Works -->
+      <section class="section-block" id="how-it-works">
+        <h2>How It Works (User Flow)</h2>
+        <p>The product is presented as a high-fidelity, interactive command center—similar to a tactical map in a modern strategy game. Designed specifically for defense analysts, geopolitical researchers, and commodity trading desks.</p>
+        
+        <ul>
+          <li><strong>1. Monitor:</strong> The user observes a global live-feed of geopolitical "signals" (natural disasters, troop movements, economic shifts) updated every 45 seconds.</li>
+          <li><strong>2. Trigger:</strong> The user selects a region or a specific signal and initiates a "What If" scenario (e.g., "What if oil prices increase by 30%?").</li>
+          <li><strong>3. Simulate:</strong> The engine runs 1,000+ Monte Carlo simulations in seconds, modeling every possible outcome and its probability.</li>
+          <li><strong>4. Execute:</strong> The system outputs a Strategic Briefing containing the Prediction, the Causal Narrative, and a 3-5 step Action Plan.</li>
+        </ul>
+
+        <div class="media-wrapper">
+          <img src="system-dashboard.png" alt="Paradox AIS Dashboard Interface">
+          <div class="media-caption">Figure 2.0 — The ParadoxAIS Command Center Interface (Live Preview).</div>
+        </div>
+      </section>
+
+      <!-- 05. Example Scenario -->
+      <section class="section-block" id="scenario">
+        <h2>Example Scenario: The 2019 Aramco Attack</h2>
+        <p>To understand the difference between heuristic models and causal simulation, consider the 2019 drone attacks on Saudi oil facilities.</p>
+        <ul>
+          <li><strong>The Input:</strong> Kinetic strikes on global energy infrastructure.</li>
+          <li><strong>The Simulation:</strong> ParadoxAIS models the impact on global supply chains, political stability, and regional tensions simultaneously.</li>
+          <li><strong>The Output:</strong> While most traditional systems flagged "High Alert" and prepared for immediate escalation, ParadoxAIS assigned a <strong>78% probability to a neutral (non-escalatory) outcome</strong>, accurately aligning with the actual historical geopolitical response.</li>
+          <li><strong>Result:</strong> Providing a strategy that avoids unnecessary escalation while maintaining defensive readiness.</li>
+        </ul>
+      </section>
+
+      <!-- 06. Tech Stack -->
+      <section class="section-block" id="tech">
+        <h2>Technology (Simplified)</h2>
+        <p>ParadoxAIS replaces black-box AI with a causal simulation engine that models how events influence each other over time.</p>
+        <ul>
+          <li><strong>Knowledge Base (Atlas Graph):</strong> A global graph of relationships between countries, commodities, and risk factors.</li>
+          <li><strong>Simulation Engine:</strong> A mathematical model that runs thousands of "virtual worlds" (Monte Carlo pathways) to find the most likely future.</li>
+          <li><strong>Decision Scoring:</strong> A formulaic approach (<code>Reward - Risk * Uncertainty</code>) that ensures recommendations are mathematically sound and free from human emotional bias.</li>
+        </ul>
+      </section>
+
+      <!-- 07. Proof -->
+      <section class="section-block" id="proof">
+        <h2>Validation & Proof</h2>
+        <p>In our latest <strong>v4 Validation Run</strong> across 103 historical geopolitical event nodes (including events such as the 2022 Russia-Ukraine conflict and Taiwan Strait tensions), ParadoxAIS achieved:</p>
+        <ul>
+          <li><strong>75.73% overall accuracy</strong> in predicting escalation vs. de-escalation outcomes.</li>
+          <li><strong>78 of 103 cases</strong> matched the actual historical ground truth.</li>
+          <li><strong>78.0% Average Model Confidence</strong> across the full dataset.</li>
+        </ul>
+        <p>The system consistently outperforms baseline heuristic and rule-based models used in traditional risk analysis, specifically by identifying non-obvious de-escalation windows prior to kinetic exchanges.</p>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // Simple script to highlight active TOC item based on scroll position
+    const sections = document.querySelectorAll('.section-block, .article-header');
+    const navItems = document.querySelectorAll('.toc-item');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - 100) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      navItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.querySelector('a').getAttribute('href').substring(1) === current) {
+          item.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

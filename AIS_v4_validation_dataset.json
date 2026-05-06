@@ -1,0 +1,142 @@
+{
+  "$schema": "https://paradoxai.lab/schemas/v4-validation-batch.json",
+  "metadata": {
+    "version": "4.0.118",
+    "engine": "AIS · v4 Production",
+    "generated": "2026-04-22T18:00:00Z",
+    "dataset": "ATLAS Graph · 103 Geopolitical Event Nodes",
+    "horizon_window": "1990-01-01 to 2024-12-31",
+    "evaluation_mode": "held-out, no fine-tuning on test scenarios",
+    "license": "CC-BY-NC 4.0 · ParadoxAI Lab 2025"
+  },
+  "summary": {
+    "total_scenarios": 103,
+    "correct_predictions": 82,
+    "mismatches": 25,
+    "prediction_accuracy": 0.7961,
+    "average_model_confidence": 0.78,
+    "median_pipeline_latency_ms": 500,
+    "monte_carlo_paths_per_scenario": 1000,
+    "diversity_penalty_lambda": 0.15
+  },
+  "performance_by_outcome_class": {
+    "escalation": {
+      "n": 41,
+      "accuracy": 0.9512,
+      "notes": "Near-perfect detection. Multi-agent threshold logic correctly identifies adversarial actor escalation patterns."
+    },
+    "neutral": {
+      "n": 38,
+      "accuracy": 0.8421,
+      "notes": "Strong performance. Correctly identifies posturing vs action."
+    },
+    "de_escalation": {
+      "n": 24,
+      "accuracy": 0.5417,
+      "notes": "Conservative bias toward security-first actions. v5 addresses with stability_index and leader_approval weighting."
+    }
+  },
+  "key_samples": [
+    {
+      "scenario_id": "aramco_2019",
+      "description": "Drone attacks on Saudi oil facilities, September 2019",
+      "historical_outcome": "neutral",
+      "predicted_strategy": "deploy_naval_surveillance",
+      "predicted_outcome": "neutral",
+      "p_neutral": 0.78,
+      "confidence": 0.82,
+      "result": "MATCH",
+      "inputs": ["GDELT conflict-tone spike", "Alpha Vantage WTI/Brent jump", "satellite damage assessment", "Atlas: Saudi-US-Iran edges", "historical retaliation base rates"]
+    },
+    {
+      "scenario_id": "ukraine_2022",
+      "description": "Russia-Ukraine escalation, February 2022",
+      "historical_outcome": "escalation",
+      "predicted_strategy": "deploy_naval_surveillance",
+      "predicted_outcome": "escalation",
+      "p_escalation": 0.74,
+      "confidence": 0.84,
+      "result": "MATCH",
+      "inputs": ["GDELT tone deterioration", "battalion tactical group movements", "World Bank trade-flow shifts", "energy corridor disruption signals", "buildup-to-action base rates"]
+    },
+    {
+      "scenario_id": "taiwan_2024",
+      "description": "Taiwan Strait tension cycle, 2024",
+      "historical_outcome": "neutral",
+      "predicted_strategy": "deploy_naval_surveillance",
+      "predicted_outcome": "neutral",
+      "p_neutral": 0.71,
+      "confidence": 0.79,
+      "result": "MATCH",
+      "inputs": ["ADIZ incursion frequencies", "GDELT cross-strait tone", "semiconductor inventory disclosures", "Alpha Vantage shipping volatility", "Atlas: PRC-ROC-US triangle"]
+    },
+    {
+      "scenario_id": "event_node_2",
+      "historical_outcome": "escalation",
+      "predicted_strategy": "deploy_naval_surveillance",
+      "predicted_outcome": "escalation",
+      "confidence": 0.78,
+      "result": "MATCH"
+    },
+    {
+      "scenario_id": "event_node_10",
+      "historical_outcome": "escalation",
+      "predicted_strategy": "deploy_naval_surveillance",
+      "predicted_outcome": "escalation",
+      "confidence": 0.81,
+      "result": "MATCH"
+    },
+    {
+      "scenario_id": "event_node_0",
+      "historical_outcome": "de_escalation",
+      "predicted_strategy": "deploy_naval_surveillance",
+      "predicted_outcome": "neutral",
+      "confidence": 0.74,
+      "result": "MISMATCH",
+      "failure_category": "wrong_causal_assumption",
+      "v5_fix_targeted": true
+    },
+    {
+      "scenario_id": "event_node_12",
+      "historical_outcome": "de_escalation",
+      "predicted_strategy": "deploy_naval_surveillance",
+      "predicted_outcome": "neutral",
+      "confidence": 0.71,
+      "result": "MISMATCH",
+      "failure_category": "wrong_causal_assumption",
+      "v5_fix_targeted": true
+    }
+  ],
+  "failure_analysis": {
+    "primary_failure_cluster": "de_escalation_paths",
+    "failure_categories": {
+      "wrong_causal_assumption": 18,
+      "missing_evidence": 4,
+      "convergence_fail": 2,
+      "contradictory_coa": 1
+    },
+    "v5_remediation": {
+      "priority": "raise stability_index and leader_approval edge weights when triggering diplomatic de-escalation paths",
+      "target_accuracy": 0.85,
+      "status": "active"
+    }
+  },
+  "decision_logic_v4": {
+    "score_formula": "Score = W − R · U",
+    "components": {
+      "W": "Reward (potential strategic gain)",
+      "R": "Risk magnitude (downside potential)",
+      "U": "Uncertainty (epistemic gaps in evidence)"
+    },
+    "diversity_penalty": "Score'_i = Score_i − λ · D(s_i, S_prev)  where λ = 0.15"
+  },
+  "data_sources": [
+    {"name": "World Bank", "reliability": 0.95, "domain": "economic"},
+    {"name": "Alpha Vantage", "reliability": 0.90, "domain": "commodities"},
+    {"name": "USGS", "reliability": 0.98, "domain": "seismic"},
+    {"name": "NASA EONET", "reliability": 0.92, "domain": "environmental"},
+    {"name": "GDELT", "reliability": 0.65, "domain": "news/conflict"},
+    {"name": "Synthetic", "reliability": 0.70, "domain": "simulation"}
+  ],
+  "_disclaimer": "This is a public summary of the v4 batch validation. Full per-scenario rollouts and provenance traces are released to vetted research partners under NDA. Contact: research@paradoxai.lab"
+}

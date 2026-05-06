@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ParadoxAI Lab | Paradox AIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0a0a0a;
+      --surface-2: #141414;
+      --text: #ffffff;
+      --muted: #888888;
+      --faint: #444444;
+      --line: rgba(255, 255, 255, 0.1);
+      --line-strong: rgba(255, 255, 255, 0.2);
+      --accent: #4ade80;
+      /* Tactical green */
+      --sans: 'Inter', -apple-system, sans-serif;
+      --display: 'Outfit', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', Consolas, monospace;
+      --ease: cubic-bezier(.22, 1, .36, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1400px, calc(100% - 48px));
+      margin-inline: auto;
+    }
+
+    /* NAVIGATION */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-inner {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: 18px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .nav-links a {
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    /* HERO SECTION with VIDEO BG */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+      overflow: hidden;
+      padding: 160px 24px 80px;
+    }
+
+    .hero-video-wrapper {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-video-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.5;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 1) 100%);
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 1100px;
+      padding: 0;
+    }
+
+    .hero-label {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      margin-bottom: 24px;
+      display: block;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-family: var(--display);
+      font-size: clamp(64px, 8vw, 130px);
+      font-weight: 600;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+      text-transform: uppercase;
+    }
+
+    .hero p {
+      font-size: clamp(20px, 2vw, 28px);
+      font-weight: 300;
+      color: var(--muted);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      z-index: 2;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      margin-top: 40px;
+      padding: 16px 32px;
+      background: var(--accent);
+      color: #000;
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background: #fff;
+      transform: translateY(-2px);
+    }
+
+    .system-notes {
+      margin-top: 24px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--faint);
+      line-height: 1.6;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .system-notes strong {
+      color: var(--muted);
+    }
+
+    /* MODAL STYLES */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-content {
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      width: 100%;
+      max-width: 500px;
+      padding: 40px;
+      position: relative;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+      text-align: left;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 28px;
+      cursor: pointer;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+
+    .close-btn:hover {
+      color: #fff;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-group label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: #fff;
+      padding: 12px 16px;
+      font-family: var(--sans);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .form-group select {
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    /* MASSIVE TYPOGRAPHY SECTION */
+    .statement {
+      padding: 160px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .statement h2 {
+      font-family: var(--display);
+      font-size: clamp(40px, 5vw, 72px);
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      max-width: 1100px;
+    }
+
+    .statement h2 span {
+      color: var(--muted);
+    }
+
+    /* STICKY SCROLL SECTION */
+    .sticky-story {
+      position: relative;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sticky-container {
+      display: flex;
+      align-items: flex-start;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .sticky-visual {
+      position: sticky;
+      top: 64px;
+      width: 50%;
+      height: calc(100vh - 64px);
+      padding: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .visual-media {
+      width: 100%;
+      height: 80%;
+      object-fit: cover;
+      border: 1px solid var(--line-strong);
+      box-shadow: 0 0 60px rgba(74, 222, 128, 0.05);
+    }
+
+    .sticky-content {
+      width: 50%;
+      padding: 0 60px 200px;
+    }
+
+    .story-step {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .story-step .step-num {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--accent);
+      margin-bottom: 24px;
+      letter-spacing: 0.1em;
+    }
+
+    .story-step h3 {
+      font-family: var(--display);
+      font-size: 48px;
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+    }
+
+    .story-step p {
+      font-size: 22px;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.5;
+    }
+
+    /* ARCHITECTURE GRID */
+    .architecture {
+      padding: 160px 0;
+      background: var(--bg);
+    }
+
+    .arch-header {
+      margin-bottom: 80px;
+      max-width: 800px;
+    }
+
+    .arch-header h2 {
+      font-family: var(--display);
+      font-size: clamp(40px, 4vw, 56px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+    }
+
+    .arch-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 1px;
+      background: var(--line-strong);
+      border: 1px solid var(--line-strong);
+    }
+
+    .arch-sidebar {
+      background: var(--surface);
+      padding: 40px;
+    }
+
+    .arch-main {
+      background: var(--surface);
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .k-mono {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .tech-list {
+      list-style: none;
+      display: grid;
+      gap: 12px;
+    }
+
+    .tech-list li {
+      border: 1px solid var(--line);
+      padding: 12px 16px;
+      font-family: var(--mono);
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .vs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 24px;
+    }
+
+    .vs-table th,
+    .vs-table td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .vs-table th {
+      font-weight: 500;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* TERMINAL */
+    .terminal {
+      background: #000;
+      border: 1px solid var(--line-strong);
+      padding: 32px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .terminal .prompt {
+      color: var(--accent);
+    }
+
+    .terminal .highlight {
+      color: #fff;
+      font-weight: 500;
+    }
+
+    /* FULL BLEED IMAGE PREVIEW */
+    .system-preview {
+      padding: 120px 0;
+      background: var(--surface-2);
+      border-top: 1px solid var(--line);
+      text-align: center;
+    }
+
+    .preview-wrapper {
+      max-width: 1400px;
+      margin: 60px auto 0;
+      border: 1px solid var(--line-strong);
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+    }
+
+    .preview-wrapper img {
+      width: 100%;
+      display: block;
+    }
+
+    /* FOOTER */
+    .footer {
+      padding: 60px 0;
+      border-top: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    @media (max-width: 1024px) {
+      .sticky-container {
+        flex-direction: column;
+      }
+
+      .sticky-visual {
+        position: relative;
+        width: 100%;
+        height: 60vh;
+        top: 0;
+        padding: 24px;
+      }
+
+      .sticky-content {
+        width: 100%;
+        padding: 40px 24px;
+      }
+
+      .story-step {
+        min-height: auto;
+        padding: 60px 0;
+      }
+
+      .arch-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="#top">ParadoxAI Lab</a>
+      <div class="nav-links">
+        <a href="#overview">Overview</a>
+        <a href="#how-it-works">Architecture</a>
+        <a href="paradox-explained.html">Explained</a>
+        <a href="documentation.html">Docs & Cases</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top">
+    <!-- HERO SECTION -->
+    <section class="hero">
+      <div class="hero-video-wrapper">
+        <video autoplay muted loop playsinline>
+          <source
+            src="https://assets.mixkit.co/videos/preview/mixkit-global-world-map-network-connection-animation-31621-large.mp4"
+            type="video/mp4">
+          <!-- Fallback image -->
+          <img src="hero_bg.png" alt="Paradox AIS Hero Background"
+            style="width: 100%; height: 100%; object-fit: cover; opacity: 0.6;">
+        </video>
+        <div class="hero-overlay"></div>
+      </div>
+      <div class="hero-content">
+        <div style="max-width: 900px; margin: 0 auto;">
+          <span class="hero-label">The Geopolitical Decision Engine</span>
+          <h1>PARADOX AIS</h1>
+          <p>The operating system for autonomous strategic intelligence. Moving beyond data integration into causal
+            simulation.</p>
+
+          <button class="btn-primary" onclick="document.getElementById('request-modal').style.display='flex';"
+            style="border: none; cursor: pointer;">Request Access</button>
+          <div class="system-notes">
+            <p><strong>SECURITY NOTICE:</strong> This is an advanced intelligence system. Access is strictly controlled.
+            </p>
+            <p>Authorization required for deployment. Unauthorized access is prohibited.</p>
+          </div>
+        </div>
+
+        <!-- MAIN SHOWCASE VIDEO -->
+        <div
+          style="margin-top: 80px; border: 1px solid var(--line-strong); box-shadow: 0 40px 100px rgba(0,0,0,0.8); background: #000; overflow: hidden; border-radius: 8px;">
+          <video style="width: 100%; display: block;" autoplay muted loop playsinline controls>
+            <source src="e_f_a_b_b_a_da_mp_.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+      <div class="scroll-indicator">Scroll to Explore</div>
+    </section>
+
+    <!-- THE PLATFORM INTRO -->
+    <section id="overview" class="statement"
+      style="padding: 160px 0; border-bottom: 1px solid var(--line); text-align: center;">
+      <div class="container">
+        <div
+          style="font-family: var(--mono); font-size: 14px; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 32px; text-transform: uppercase;">
+          A ParadoxAI Lab Platform</div>
+        <h2
+          style="font-size: clamp(32px, 5vw, 64px); font-weight: 400; line-height: 1.2; max-width: 1100px; margin: 0 auto;">
+          Most intelligence platforms tell you what is happening. <br>
+          <span style="color: var(--muted);">Paradox AIS tells you what will happen next.</span>
+        </h2>
+        <p
+          style="color: var(--muted); font-size: 22px; max-width: 800px; margin: 40px auto 0; line-height: 1.6; font-weight: 300;">
+          Designed by ParadoxAI Lab, Paradox AIS is the first commercially available operating system capable of
+          executing autonomous causal simulations for defense and global enterprise.
+        </p>
+
+      </div>
+    </section>
+
+    <!-- STICKY SCROLL: HOW IT WORKS -->
+    <section id="how-it-works" class="sticky-story">
+      <div class="sticky-container">
+
+        <div class="sticky-visual">
+          <img src="satellite_surveillance.png" alt="Paradox AIS Operational Map" class="visual-media">
+        </div>
+
+        <div class="sticky-content">
+          <div class="story-step">
+            <div class="step-num">01 // MONITOR</div>
+            <h3>Global Signal Ingestion</h3>
+            <p>ParadoxAIS observes a global live-feed of geopolitical signals—from natural disasters to troop movements
+              and economic shifts—updated every 45 seconds to ensure operational superiority.</p>
+          </div>
+
+          <div class="story-step">
+            <div class="step-num">02 // TRIGGER</div>
+            <h3>Scenario Activation</h3>
+            <p>When tension nodes are detected, the system does not wait for a human operator. It instantly initiates
+              thousands of parallel "What-If" scenarios targeting specific regional and economic flashpoints.</p>
+          </div>
+
+          <div class="story-step">
+            <div class="step-num">03 // SIMULATE</div>
+            <h3>Monte Carlo Execution</h3>
+            <p>Using the v4 Causal Engine and the Atlas Graph knowledge base, Paradox runs 1,000+ simulations in
+              seconds, modeling multi-agent utility functions to eliminate traditional defensive bias.</p>
+          </div>
+
+          <div class="story-step">
+            <div class="step-num">04 // EXECUTE</div>
+            <h3>Decision Supremacy</h3>
+            <p>The output is not just an alert. It is a mathematically sound Strategic Briefing providing exact
+              probabilities, causal narratives, and a step-by-step Action Plan based on Reward - Risk * Uncertainty.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- THE SOFTWARE APPLICATIONS -->
+    <section id="software"
+      style="padding: 160px 0; background: var(--surface-2); border-bottom: 1px solid var(--line);">
+      <div class="container">
+        <div class="k-mono"
+          style="color: var(--accent); margin-bottom: 24px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;">
+          Core Applications</div>
+        <h2
+          style="font-family: var(--display); font-size: clamp(40px, 4vw, 56px); font-weight: 500; margin-bottom: 64px; max-width: 900px; letter-spacing: -0.02em;">
+          The Paradox AIS Software Suite</h2>
+
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1px; background: var(--line-strong); border: 1px solid var(--line-strong);">
+
+          <div style="background: var(--surface); padding: 48px; display: flex; flex-direction: column;">
+            <div
+              style="font-family: var(--mono); font-size: 10px; color: var(--faint); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.1em;">
+              App 01</div>
+            <h3
+              style="font-family: var(--display); font-size: 28px; font-weight: 600; margin-bottom: 24px; color: #fff; letter-spacing: -0.01em;">
+              Pulse Detection Pipeline</h3>
+            <p style="color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 40px;">
+              The ingestion layer. It continuously pulls from global OSINT, commodity pipelines, and proprietary defense
+              databases. Crucially, it ranks signals by strategic consequence, stripping away the noise that causes
+              defensive bias.
+            </p>
+            <div
+              style="margin-top: auto; border-top: 1px solid var(--line); padding-top: 24px; color: var(--accent); font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">
+              Real-Time OSINT Fusion</div>
+          </div>
+
+          <div style="background: var(--surface); padding: 48px; display: flex; flex-direction: column;">
+            <div
+              style="font-family: var(--mono); font-size: 10px; color: var(--faint); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.1em;">
+              App 02</div>
+            <h3
+              style="font-family: var(--display); font-size: 28px; font-weight: 600; margin-bottom: 24px; color: #fff; letter-spacing: -0.01em;">
+              The Atlas Graph</h3>
+            <p style="color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 40px;">
+              A living knowledge base that maps the causal relationships of the world. Rather than just storing objects,
+              Atlas understands how a shift in maritime logistics in the Strait of Hormuz causally affects European
+              energy grids.
+            </p>
+            <div
+              style="margin-top: auto; border-top: 1px solid var(--line); padding-top: 24px; color: var(--accent); font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">
+              Causal Knowledge Base</div>
+          </div>
+
+          <div style="background: var(--surface); padding: 48px; display: flex; flex-direction: column;">
+            <div
+              style="font-family: var(--mono); font-size: 10px; color: var(--faint); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.1em;">
+              App 03</div>
+            <h3
+              style="font-family: var(--display); font-size: 28px; font-weight: 600; margin-bottom: 24px; color: #fff; letter-spacing: -0.01em;">
+              v4 Simulation Engine</h3>
+            <p style="color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 40px;">
+              The core differentiator. When a threat triggers, the engine runs 1,000+ Monte Carlo pathways in seconds.
+              It models adversarial utility functions to find realistic futures instead of assuming worst-case
+              scenarios.
+            </p>
+            <div
+              style="margin-top: auto; border-top: 1px solid var(--line); padding-top: 24px; color: var(--accent); font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">
+              Monte Carlo Predictor</div>
+          </div>
+
+          <div style="background: var(--surface); padding: 48px; display: flex; flex-direction: column;">
+            <div
+              style="font-family: var(--mono); font-size: 10px; color: var(--faint); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.1em;">
+              App 04</div>
+            <h3
+              style="font-family: var(--display); font-size: 28px; font-weight: 600; margin-bottom: 24px; color: #fff; letter-spacing: -0.01em;">
+              Strategic Briefing</h3>
+            <p style="color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 40px;">
+              Translating massive computational power into decision clarity. The system generates executive-ready
+              narratives, exact probabilities, and a prioritized action plan scored dynamically by the Reward - Risk *
+              Uncertainty matrix.
+            </p>
+            <div
+              style="margin-top: auto; border-top: 1px solid var(--line); padding-top: 24px; color: var(--accent); font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">
+              Executive Output</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE & COMPARISON GRID -->
+    <section id="comparison" class="architecture">
+      <div class="container">
+        <div class="arch-header">
+          <div class="k-mono" style="color: var(--accent);">System Architecture</div>
+          <h2>Designed for consequence.</h2>
+          <p style="color: var(--muted); font-size: 20px;">While legacy systems (like Palantir Gotham) rely on
+            object-relational mapping for human analysts, ParadoxAIS creates a new category of autonomous strategic
+            intelligence.</p>
+        </div>
+
+        <div class="arch-grid">
+          <!-- SIDEBAR -->
+          <div class="arch-sidebar">
+            <div class="k-mono">Core Tech Stack</div>
+            <ul class="tech-list">
+              <li style="border-left: 2px solid var(--accent); color: #fff;">Atlas Graph Knowledge Base</li>
+              <li>Causal Engine v4</li>
+              <li>Monte Carlo Execution</li>
+              <li>Multi-Agent Adversarial Logic</li>
+            </ul>
+          </div>
+
+          <!-- MAIN AREA -->
+          <div class="arch-main">
+            <div>
+              <div class="k-mono">Comparative Architecture</div>
+              <table class="vs-table">
+                <thead>
+                  <tr>
+                    <th>Vector</th>
+                    <th>Legacy Systems (Gotham)</th>
+                    <th style="color: var(--accent);">ParadoxAIS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="color: #fff;">Primary Goal</td>
+                    <td>Data Integration & Analysis</td>
+                    <td style="color: #fff; font-weight: 500;">Simulation & Decision Support</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #fff;">Output</td>
+                    <td>"What is the situation?"</td>
+                    <td style="color: #fff; font-weight: 500;">"What happens next?"</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #fff;">Core Tech</td>
+                    <td>Object-relational mapping</td>
+                    <td style="color: #fff; font-weight: 500;">Monte Carlo + Causal Engine</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #fff;">Decision Bias</td>
+                    <td>Relies on human operator</td>
+                    <td style="color: #fff; font-weight: 500;">Algorithmic diversity penalty</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- TERMINAL / LOGS -->
+            <div class="terminal">
+              <div class="k-mono" style="margin-bottom: 12px; color: var(--faint);">v4.Engine.Execution_Log</div>
+              <div>
+                <span class="prompt">[04:22:18 UTC]</span> > Initializing ParadoxAIS Core... [OK]<br>
+                <span class="prompt">[04:22:19 UTC]</span> > Connecting to Atlas Graph... [OK]<br>
+                <span class="prompt">[04:22:20 UTC]</span> > <span class="highlight">DETECTED TENSION:</span> Taiwan
+                Strait Node.<br>
+                <span class="prompt">[04:22:21 UTC]</span> > Running 1,000+ Monte Carlo pathways...<br>
+                <span style="color: var(--faint);">[04:22:23 UTC]</span> > ... calculating multi-agent utility functions
+                ...<br>
+                <span class="prompt">[04:22:25 UTC]</span> > <span class="highlight">OUTPUT: 82% PROBABILITY OF
+                  ESCALATION.</span><br>
+                <span class="prompt">[04:22:25 UTC]</span> > ⮑ Action: [Hedge energy exposure] [Initiate backchannel].
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FULL SCREEN PREVIEW -->
+    <section class="system-preview">
+      <div class="container">
+        <div class="k-mono">Command Center Interface</div>
+        <h2 style="font-size: 40px; margin-top: 16px;">The Operator Dashboard</h2>
+
+        <div class="preview-wrapper">
+          <!-- User provided Dashboard Image -->
+          <img src="system-dashboard.png" alt="Paradox AIS Dashboard Interface">
+        </div>
+      </div>
+    </section>
+
+    <!-- SECURITY & DEPLOYMENT SECTION -->
+    <section style="padding: 120px 0; background: var(--bg); border-top: 1px solid var(--line);">
+      <div class="container">
+        <div class="k-mono" style="color: var(--accent); margin-bottom: 24px; text-transform: uppercase;">Tactical
+          Deployment</div>
+        <h2 style="font-family: var(--display); font-size: 40px; margin-bottom: 60px;">Operational Readiness</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+          <div>
+            <img src="security_forces.png" alt="Security Forces Command"
+              style="width: 100%; border: 1px solid var(--line-strong); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+            <p style="margin-top: 24px; color: var(--muted); font-size: 16px;">
+              <strong>Special Operations Integration:</strong> ParadoxAIS feeds directly into tactical command centers,
+              providing security forces with real-time situational awareness and causal risk vectors before deployment.
+            </p>
+          </div>
+          <div>
+            <img src="global_network.png" alt="Global Network Nodes"
+              style="width: 100%; border: 1px solid var(--line-strong); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+            <p style="margin-top: 24px; color: var(--muted); font-size: 16px;">
+              <strong>Global Node Architecture:</strong> The system maintains persistent surveillance across thousands
+              of global nodes, ensuring unbroken intelligence coverage even in highly contested informational
+              environments.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>
+        <span style="display: block; margin-bottom: 8px;">ParadoxAI Lab // 2026</span>
+        <a href="mailto:contact.paradoxailab@gmail.com" style="color: var(--muted); font-size: 13px; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--muted)'">contact.paradoxailab@gmail.com</a>
+      </div>
+      <div class="footer-links" style="display: flex; gap: 24px;">
+        <a href="#overview">Overview</a>
+        <a href="paradox-explained.html">Explained</a>
+        <a href="documentation.html">Docs & Cases</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- REQUEST ACCESS MODAL -->
+  <div id="request-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="k-mono" style="color: var(--accent);">Authorization Required</div>
+        <button class="close-btn"
+          onclick="document.getElementById('request-modal').style.display='none';">&times;</button>
+      </div>
+      <h2
+        style="font-family: var(--display); font-size: 32px; font-weight: 500; margin-bottom: 16px; letter-spacing: -0.01em;">
+        Request Access</h2>
+      <p style="color: var(--muted); font-size: 14px; margin-bottom: 32px; line-height: 1.6;">
+        Paradox AIS is restricted to authorized defense, intelligence, and vetted commercial partners. Please provide
+        your operational details below. For direct inquiries, email <a href="mailto:contact.paradoxailab@gmail.com" style="color: var(--accent);">contact.paradoxailab@gmail.com</a>.
+      </p>
+      <form
+        onsubmit="event.preventDefault(); alert('Request submitted to ParadoxAI Command. You will be contacted upon verification.'); document.getElementById('request-modal').style.display='none';">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" required placeholder="John Doe">
+        </div>
+        <div class="form-group">
+          <label>Organization / Agency</label>
+          <input type="text" required placeholder="e.g. Department of Defense">
+        </div>
+        <div class="form-group">
+          <label>Official Email</label>
+          <input type="email" required placeholder="name@agency.gov">
+        </div>
+        <div class="form-group">
+          <label>Clearance Level</label>
+          <select required>
+            <option value="" disabled selected>Select clearance level...</option>
+            <option value="unclassified">Unclassified / Commercial</option>
+            <option value="secret">Secret</option>
+            <option value="top_secret">Top Secret</option>
+            <option value="sci">TS/SCI</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Operational Justification</label>
+          <textarea rows="4" required placeholder="Briefly describe your intended use case..."></textarea>
+        </div>
+        <button type="submit" class="btn-primary"
+          style="width: 100%; margin-top: 8px; border: none; cursor: pointer;">Submit Request</button>
+      </form>
+    </div>
+  </div>
+
+</body>
+
+</html>
